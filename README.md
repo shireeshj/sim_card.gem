@@ -1,6 +1,8 @@
 # Sim Card Gem
 
-Access and control cellphone SIM card functionality via AT commands
+Access and control cellphone SIM card functionality via AT commands.
+
+The code is based on following sample: http://www.dzone.com/snippets/send-and-receive-sms-text
 
 ## Hardware
 
