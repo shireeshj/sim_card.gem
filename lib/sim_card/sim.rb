@@ -39,7 +39,7 @@ class SimCard
     # list SMS messages in SIM memory
     def sms_messages
       raw_sim_output = cmd("AT+CMGL=\"ALL\"")
-      SmsMessage.to_messages raw_sim_output
+      ReceivedSmsMessage.to_messages raw_sim_output
     end
     
     # remove SMS message from SIM card memory
