@@ -4,6 +4,12 @@ Access and control cellphone SIM card functionality via AT commands.
 
 The code is based on following sample: http://www.dzone.com/snippets/send-and-receive-sms-text
 
+## Changelog
+
+### 0.0.2
+
+Can only list and delete arrived SMS messages, which is helpful enough when you need [redirect SMS messages](https://gist.github.com/petervojtek/6297229).
+
 ## Hardware
 
 You will need som GSM modem to connect to your computer.
