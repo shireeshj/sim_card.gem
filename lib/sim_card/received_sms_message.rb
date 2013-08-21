@@ -14,7 +14,7 @@ class SimCard
         # +CMGL: 2,"REC READ","+421918987987","","13/08/20,19:00:44+08"
         message_id, _, sender_number, _, date, time = header.gsub("\"", '').split(',')
         
-        timestamp = DateTime.strptime (date + '' + time), '%y/%m/%d %H:%M:%S'
+        timestamp = DateTime.strptime (date + ' ' + time), '%y/%m/%d %H:%M:%S'
         message_text = text_lines.join "\n"
         
         sms_message = ReceivedSmsMessage.new message_id, sender_number, timestamp, message_text
