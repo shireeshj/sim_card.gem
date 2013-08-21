@@ -28,6 +28,7 @@ class SimCard
     
     # * message_id : ID of the sms message as provided by the SIM card
     # * sender_number : who sent the message
+    # * timestamp : time of message arrival
     # * text : message text
     def initialize message_id, sender_number, timestamp, text
       @message_id = message_id
