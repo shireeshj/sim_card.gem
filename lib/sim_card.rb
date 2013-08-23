@@ -3,5 +3,8 @@ class SimCard
 end
 
 require 'date'
-require 'sim_card/received_sms_message'
-require 'sim_card/sim'
+
+root = File.join(File.dirname(__FILE__), 'sim_card')
+require File.join(root, 'received_sms_message.rb')
+require File.join(root, 'sim.rb')
+require File.join(root, 'signal_quality.rb')

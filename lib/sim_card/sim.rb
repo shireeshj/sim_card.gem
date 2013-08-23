@@ -1,7 +1,7 @@
 class SimCard
   
-# code below is based on:
-# http://www.dzone.com/snippets/send-and-receive-sms-text
+  # code below is based on:
+  # http://www.dzone.com/snippets/send-and-receive-sms-text
 
   class Sim
   
@@ -15,12 +15,12 @@ class SimCard
       options = default_options.merge user_options
       
       @port = SerialPort.new(options[:port], options[:speed])
-      cmd("AT")
-      cmd("AT+CPIN=\"#{options[:pin]}\"")
+      send_raw_at_command("AT")
+      send_raw_at_command("AT+CPIN=\"#{options[:pin]}\"")
       # Set to text mode
-      cmd("AT+CMGF=1")
+      send_raw_at_command("AT+CMGF=1")
       # Set SMSC number
-      cmd("AT+CSCA=\"#{options[:sms_center_no]}\"") if options[:sms_center_no]
+      send_raw_at_command("AT+CSCA=\"#{options[:sms_center_no]}\"") if options[:sms_center_no]
     end
   
     # correctly disconnect from SIM card
@@ -29,32 +29,39 @@ class SimCard
     end
 
     def send_sms number, message_text
-      cmd("AT+CMGS=\"#{number}\"")
-      cmd("#{message_text[0..140]}#{26.chr}\r\r")
+      send_raw_at_command("AT+CMGS=\"#{number}\"")
+      send_raw_at_command("#{message_text[0..140]}#{26.chr}\r\r")
       sleep 3
       wait
-      cmd("AT")
+      send_raw_at_command("AT")
     end
   
     # list SMS messages in SIM memory
     def sms_messages
-      raw_sim_output = cmd("AT+CMGL=\"ALL\"")
+      raw_sim_output = send_raw_at_command("AT+CMGL=\"ALL\"")
       ReceivedSmsMessage.to_messages raw_sim_output
     end
     
     # remove SMS message from SIM card memory
     # * sms_message: instance of SimCard::SmsMessage to be deleted
     def delete_sms_message sms_message
-      cmd("AT+CMGD=#{sms_message.message_id}")
+      send_raw_at_command("AT+CMGD=#{sms_message.message_id}")
     end
-  
-    private
-    def cmd(cmd)
+    
+    # in dBm. -60 is almost perfect signal, -112 is very poor (call dropping bad)
+    def signal_strength
+      raw_sim_output = send_raw_at_command 'AT+CSQ'
+      sq = SimCard::SignalQuality.new raw_sim_output
+      return sq.signal_strength
+    end
+
+    def send_raw_at_command cmd
       # puts "SIM CMD IN:#{cmd}"
       @port.write(cmd + "\r")
       wait
     end
     
+    private
     def wait
       buffer = ''
       while IO.select([@port], [], [], 0.25)

@@ -1,5 +1,5 @@
 require 'test/unit'
-require 'sim_card'
+require File.join(File.dirname(__FILE__), '..', 'lib', 'sim_card.rb')
  
 class SimCardTest < Test::Unit::TestCase
   
@@ -49,4 +49,11 @@ STRING
     messages = SimCard::ReceivedSmsMessage.to_messages raw_sim_output
     assert_equal 0, messages.size   
   end
+  
+  def test_signal_quality_should_provide_signal_strength_and_bit_error_rate
+    raw_sim_output = "AT+CSQ\r\r\n+CSQ: 19,99\r\n\r\nOK\r\n"
+    sq = SimCard::SignalQuality.new(raw_sim_output)
+    assert_equal -75, sq.signal_strength
+  end
+  
 end
