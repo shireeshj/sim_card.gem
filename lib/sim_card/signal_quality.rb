@@ -1,13 +1,6 @@
 class SimCard
   class SignalQuality
     attr_reader :signal_strength
-    
-    # received signal strength indication
-    # 0 - (-113) dBm or less
-    # 1 - (-111) dBm
-    # 2..30 - (-109)dBm..(-53)dBm / 2 dBm per step
-    # 31 - (-51)dBm or greater
-    # 99 - not known or not detectable
 
     def initialize raw_sim_output
       @raw_sim_output = raw_sim_output

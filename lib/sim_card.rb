@@ -1,4 +1,4 @@
-# see README
+# see README or visit https://github.com/petervojtek/sim_card.gem
 class SimCard
 end
 

@@ -2,9 +2,13 @@
 
 Access and control cellphone SIM card functionality via AT commands.
 
-The code is based on following sample: http://www.dzone.com/snippets/send-and-receive-sms-text
+The first pieces of code are based on following sample: http://www.dzone.com/snippets/send-and-receive-sms-text
 
 ## Changelog
+
+### 0.0.3
+
+* SignalQuality added.
 
 ### 0.0.2
 
@@ -25,6 +29,14 @@ You may need to use `usb_modeswitch` if the USB device does not behaves as GSM m
 You may check if the device is properly connected by running `screen /dev/ttyUSB0 9600` as sudoer.
 Then enter command `AT` and you should see response `OK`.
 
+## Installation
+
+gem is hosted on [rubygems.org](https://rubygems.org/gems/sim_card)
+
+```
+gem install sim_card
+```
+
 ## Usage
 
 ```
@@ -38,3 +50,7 @@ sim.delete_sms_message first_sms_message
 sim.close
 
 ```
+
+## Further Reading
+
+ * [AT Commands Reference Guide](https://www.sparkfun.com/datasheets/Cellular%20Modules/AT_Commands_Reference_Guide_r0.pdf)
