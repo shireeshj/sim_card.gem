@@ -8,15 +8,15 @@ class SimCard
     # connect to SIM card. user_options may contain:
     # * port : device where the gsm modem is connected, default is '/dev/ttyUSB0'
     # * speed : connection speed in bauds, default is 9600
-    # * pin : pin to your sim card, default is '0000'
+    # * pin : pin code to your sim card. not required if your sim does not require authorization via pin
     # * sms_center_no : SMS center of you provider. required only if you want to send SMS messages
     def initialize(user_options = {})
-      default_options = {:port => '/dev/ttyUSB0', :speed => 9600, :pin => '0000'}
+      default_options = {:port => '/dev/ttyUSB0', :speed => 9600}
       options = default_options.merge user_options
       
       @port = SerialPort.new(options[:port], options[:speed])
       send_raw_at_command("AT")
-      send_raw_at_command("AT+CPIN=\"#{options[:pin]}\"")
+      authorize options[:pin]
       # Set to text mode
       send_raw_at_command("AT+CMGF=1")
       # Set SMSC number
@@ -55,6 +55,7 @@ class SimCard
       return sq.signal_strength
     end
 
+    # directly send AT commands to SIM
     def send_raw_at_command cmd
       # puts "SIM CMD IN:#{cmd}"
       @port.write(cmd + "\r")
@@ -70,6 +71,23 @@ class SimCard
       end
       # puts "SIM OUT:#{buffer}"
       buffer
+    end
+    
+    def authorize pin
+      auth_status = send_raw_at_command("AT+CPIN?")
+      if auth_status.include?('READY')
+        # no pin required or already authorized
+        return true
+      elsif auth_status.include?('SIM PIN')
+        response = send_raw_at_command("AT+CPIN=\"#{pin}\"")
+        if response.include?('OK')
+          return true
+        else
+          raise Error.new("SIM authorization failed: #{response.inspect}")
+        end
+      else
+        raise Error.new("unknown SIM authorization status: #{auth_status.inspect}")
+      end
     end
   end
 end
