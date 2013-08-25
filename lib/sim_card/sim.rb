@@ -10,10 +10,12 @@ class SimCard
     # * speed : connection speed in bauds, default is 9600
     # * pin : pin code to your sim card. not required if your sim does not require authorization via pin
     # * sms_center_no : SMS center of you provider. required only if you want to send SMS messages
+    # * debug_mode: when set to true, will print all communication with SIM card to stdout
     def initialize(user_options = {})
       default_options = {:port => '/dev/ttyUSB0', :speed => 9600}
       options = default_options.merge user_options
       
+      @debug_mode = (options[:debug_mode] == true)
       @port = SerialPort.new(options[:port], options[:speed])
       initial_check
       authorize options[:pin]
@@ -57,7 +59,7 @@ class SimCard
 
     # directly send AT commands to SIM
     def send_raw_at_command cmd
-      # puts "SIM CMD IN:#{cmd}"
+      puts "SIM CMD IN:#{cmd}" if @debug_mode
       @port.write(cmd + "\r")
       wait
     end
@@ -69,7 +71,7 @@ class SimCard
         chr = @port.getc.chr;
         buffer += chr
       end
-      # puts "SIM OUT:#{buffer}"
+      puts "SIM OUT:#{buffer}" if @debug_mode
       buffer
     end
     
