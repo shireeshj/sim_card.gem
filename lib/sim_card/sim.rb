@@ -15,7 +15,7 @@ class SimCard
       options = default_options.merge user_options
       
       @port = SerialPort.new(options[:port], options[:speed])
-      send_raw_at_command("AT")
+      initial_check
       authorize options[:pin]
       # Set to text mode
       send_raw_at_command("AT+CMGF=1")
@@ -71,6 +71,15 @@ class SimCard
       end
       # puts "SIM OUT:#{buffer}"
       buffer
+    end
+    
+    def initial_check
+      response = send_raw_at_command("AT")
+      if response.include?("OK")
+        return true
+      else
+        raise Error.new("SIM is not responsing properly to initial handshake. response: #{response.inspect}")
+      end
     end
     
     def authorize pin
