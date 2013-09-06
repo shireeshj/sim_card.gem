@@ -15,14 +15,17 @@ class SimCard
       default_options = {:port => '/dev/ttyUSB0', :speed => 9600}
       options = default_options.merge user_options
       
-      @debug_mode = (options[:debug_mode] == true)
-      @port = SerialPort.new(options[:port], options[:speed])
+      @port = SerialPort.new options[:port], options[:speed]
+      
+      debug_mode = (options[:debug_mode] == true)
+      @at_interface = RealAtInterface.new @port, debug_mode
+      
       initial_check
       authorize options[:pin]
       # Set to text mode
-      send_raw_at_command("AT+CMGF=1")
+      @at_interface.send "AT+CMGF=1"
       # Set SMSC number
-      send_raw_at_command("AT+CSCA=\"#{options[:sms_center_no]}\"") if options[:sms_center_no]
+      @at_interface.send "AT+CSCA=\"#{options[:sms_center_no]}\"" if options[:sms_center_no]
     end
   
     # correctly disconnect from SIM card
@@ -31,52 +34,33 @@ class SimCard
     end
 
     def send_sms number, message_text
-      send_raw_at_command("AT+CMGS=\"#{number}\"")
-      send_raw_at_command("#{message_text[0..140]}#{26.chr}\r\r")
+      @at_interface.send "AT+CMGS=\"#{number}\""
+      @at_interface.send "#{message_text[0..140]}#{26.chr}\r\r"
       sleep 3
-      wait
-      send_raw_at_command("AT")
+      @at_interface.send "AT"
     end
   
     # list SMS messages in SIM memory
     def sms_messages
-      raw_sim_output = send_raw_at_command("AT+CMGL=\"ALL\"")
-      ReceivedSmsMessage.to_messages raw_sim_output
+      ReceivedSmsMessage.load_messages @at_interface
     end
     
     # remove SMS message from SIM card memory
     # * sms_message: instance of SimCard::SmsMessage to be deleted
     def delete_sms_message sms_message
-      send_raw_at_command("AT+CMGD=#{sms_message.message_id}")
+      @at_interface.send "AT+CMGD=#{sms_message.message_id}"
     end
     
     # in dBm. -60 is almost perfect signal, -112 is very poor (call dropping bad)
     def signal_strength
-      raw_sim_output = send_raw_at_command 'AT+CSQ'
-      sq = SimCard::SignalQuality.new raw_sim_output
+      sq = SimCard::SignalQuality.new @at_interface
       return sq.signal_strength
-    end
-
-    # directly send AT commands to SIM
-    def send_raw_at_command cmd
-      puts "SIM CMD IN:#{cmd}" if @debug_mode
-      @port.write(cmd + "\r")
-      wait
     end
     
     private
-    def wait
-      buffer = ''
-      while IO.select([@port], [], [], 0.25)
-        chr = @port.getc.chr;
-        buffer += chr
-      end
-      puts "SIM OUT:#{buffer}" if @debug_mode
-      buffer
-    end
     
     def initial_check
-      response = send_raw_at_command("AT")
+      response = @at_interface.send "AT"
       if response.include?("OK")
         return true
       else
@@ -85,12 +69,12 @@ class SimCard
     end
     
     def authorize pin
-      auth_status = send_raw_at_command("AT+CPIN?")
+      auth_status = @at_interface.send "AT+CPIN?"
       if auth_status.include?('READY')
         # no pin required or already authorized
         return true
       elsif auth_status.include?('SIM PIN')
-        response = send_raw_at_command("AT+CPIN=\"#{pin}\"")
+        response = @at_interface.send "AT+CPIN=\"#{pin}\""
         if response.include?('OK')
           return true
         else

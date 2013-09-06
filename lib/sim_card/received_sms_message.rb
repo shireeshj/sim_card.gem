@@ -3,7 +3,8 @@ class SimCard
     
     # parse raw output from SIM card and return list of ReceivedSmsMessage instances.
     # see SimCardTest for examples of raw SIM output.
-    def self.to_messages raw_sim_output
+    def self.load_messages  at_command_sender
+      raw_sim_output = at_command_sender.send "AT+CMGL=\"ALL\""
       messages = []
       raw_input2 = raw_sim_output[14..-1] # remove initial AT+CMGL="ALL"\n
       raw_input3 = (raw_input2 || '').split('+CMGL: ')[1..-1]

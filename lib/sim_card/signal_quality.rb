@@ -2,8 +2,8 @@ class SimCard
   class SignalQuality
     attr_reader :signal_strength
 
-    def initialize raw_sim_output
-      @raw_sim_output = raw_sim_output
+    def initialize at_interface
+      @at_interface = at_interface
       @signal_strength = nil
       @bit_error_rate_min = nil
       @bit_error_rate_max = nil
@@ -12,7 +12,8 @@ class SimCard
 
     private 
     def parse
-      a = @raw_sim_output.split("\n")
+      response = @at_interface.send 'AT+CSQ'
+      a = response.split("\n")
       if a[1] && a[1].include?('+CSQ: ')
         b = a[1].match /(\d+),(\d+)/
         if b.size == 3

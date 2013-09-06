@@ -1,9 +1,11 @@
 require 'test/unit'
 require File.join(File.dirname(__FILE__), '..', 'lib', 'sim_card.rb')
  
-class SimCardTest < Test::Unit::TestCase
+class TestReceivedSmsMessages < Test::Unit::TestCase
   
-  RAW_SIM_OUTPUT1 = <<STRING
+  class MockAtInterface1 < SimCard::AtInterface
+    def send cmd
+      <<STRING
 AT+CMGL="ALL"
 +CMGL: 2,"REC READ","+421918987987","","13/08/20,19:00:44+08"
 line1
@@ -14,9 +16,11 @@ line3
 +CMGL: 1,"REC READ","+421918123123","","13/08/20,19:00:24+08"
 test1
 STRING
+    end
+  end
   
   def test_to_messages_from_raw_input_should_parse_newlines_in_message_text
-    messages = SimCard::ReceivedSmsMessage.to_messages RAW_SIM_OUTPUT1
+    messages = SimCard::ReceivedSmsMessage.load_messages MockAtInterface1.new(nil)
     assert_equal 2, messages.size
     m1, m2 = messages
     
@@ -30,7 +34,7 @@ STRING
   end
   
   def test_timestamp_is_parsed_properly
-    messages = SimCard::ReceivedSmsMessage.to_messages RAW_SIM_OUTPUT1
+    messages = SimCard::ReceivedSmsMessage.load_messages MockAtInterface1.new(nil)
     m1 = messages.first
     t = m1.timestamp
     assert_equal 2013, t.year
@@ -41,19 +45,17 @@ STRING
     assert_equal 24, t.second
   end
   
-  def test_to_messages_from_raw_input_should_provide_empty_array_when_no_messages_are_present
-    raw_sim_output = <<STRING
+  class MockAtInterface2 < SimCard::AtInterface
+    def send cmd
+      <<STRING
 AT+CMGL="ALL"    
 STRING
-    
-    messages = SimCard::ReceivedSmsMessage.to_messages raw_sim_output
-    assert_equal 0, messages.size   
-  end
+    end
+  end  
   
-  def test_signal_quality_should_provide_signal_strength_and_bit_error_rate
-    raw_sim_output = "AT+CSQ\r\r\n+CSQ: 19,99\r\n\r\nOK\r\n"
-    sq = SimCard::SignalQuality.new(raw_sim_output)
-    assert_equal -75, sq.signal_strength
+  def test_to_messages_from_raw_input_should_provide_empty_array_when_no_messages_are_present
+    messages = SimCard::ReceivedSmsMessage.load_messages MockAtInterface2.new(nil)
+    assert_equal 0, messages.size   
   end
   
 end
