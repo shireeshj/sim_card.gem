@@ -1,6 +1,6 @@
 class SimCard
   
-  # code below is based on:
+  # the initial idea is borrowed from here:
   # http://www.dzone.com/snippets/send-and-receive-sms-text
 
   class Sim
