@@ -16,17 +16,16 @@ Can only list and delete arrived SMS messages, which is helpful enough when you 
 
 ## Hardware
 
-You will need som GSM modem to connect to your computer.
-If you use linux, these few USB modems work for me:
+You probably need a GSM modem. If you use linux, these few USB modems work for me:
 
  * [Vodafone MD950](https://github.com/sk-vpohybe/stopa-monitor/wiki/3G-modem-Vodafone-MD950)
  * [Huawei E169](https://github.com/sk-vpohybe/stopa-monitor/wiki/3G-modem-Huawei-E169-E620-E800)
 
 but there are surely many more that work as well.
 
-Use `dmesg` and `lsusb` to determine what `/dev/tty*` file is the device connected to.
-You may need to use `usb_modeswitch` if the USB device does not behaves as GSM modem by default.
-You may check if the device is properly connected by running `screen /dev/ttyUSB0 9600` as sudoer.
+Use `dmesg` and `lsusb` to determine which `/dev/tty*` file is the device connected to.
+You may need to use `usb_modeswitch` if the USB device does not acts as GSM modem by default.
+You can check if the device is properly connected by running `screen /dev/ttyUSB0 9600` as sudoer.
 Then enter command `AT` and you should see response `OK`.
 
 ## Installation
