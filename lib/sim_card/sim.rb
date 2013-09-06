@@ -57,6 +57,11 @@ class SimCard
       return sq.signal_strength
     end
     
+    # for hackers
+    def send_raw_at_command cmd
+      @at_interface.send cmd
+    end
+    
     private
     
     def initial_check
