@@ -33,6 +33,7 @@ class SimCard
       @port.close
     end
 
+    # send SMS message
     def send_sms number, message_text
       @at_interface.send "AT+CMGS=\"#{number}\""
       @at_interface.send "#{message_text[0..140]}#{26.chr}\r\r"
@@ -45,13 +46,18 @@ class SimCard
       ReceivedSmsMessage.load_messages @at_interface
     end
     
+    # return instance of Phonebook
+    def phonebook
+      Phonebook.new @at_interface
+    end
+    
     # remove SMS message from SIM card memory
     # * sms_message: instance of SimCard::SmsMessage to be deleted
     def delete_sms_message sms_message
       @at_interface.send "AT+CMGD=#{sms_message.message_id}"
     end
     
-    # in dBm. -60 is almost perfect signal, -112 is very poor (call dropping bad)
+    # signal strengh in dBm. -60 is almost perfect signal, -112 is very poor (call dropping bad)
     def signal_strength
       sq = SimCard::SignalQuality.new @at_interface
       return sq.signal_strength
