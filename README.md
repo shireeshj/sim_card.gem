@@ -6,13 +6,18 @@ The first pieces of code are based on following sample: http://www.dzone.com/sni
 
 ## Changelog
 
+### 0.1.1
+
+* Robust Sim card initialization
+* Phonebook listing and search
+
 ### 0.0.3
 
 * SignalQuality added.
 
 ### 0.0.2
 
-Can only list and delete arrived SMS messages, which is helpful enough when you need [redirect SMS messages](https://gist.github.com/petervojtek/6297229).
+* Can only list and delete arrived SMS messages, which is helpful enough when you need [redirect SMS messages](https://gist.github.com/petervojtek/6297229).
 
 ## Hardware
 
@@ -44,8 +49,13 @@ require 'sim_card'
 
 sim = SimCard::Sim.new :port => '/dev/ttyACM0', :speed => 9600, :sms_center_no => '+421949909909', :pin => '5557'
 p sim.sms_messages
-first_sms_message = sim.sms_messages[0]
-sim.delete_sms_message first_sms_message
+m1 = sim.sms_messages.first
+
+phonebook = sim.phonebook
+phonebook_entry = phonebook.fuzzy_search_by_number m1.sender_number
+p "SMS was sent by #{phonebook_entry.name}"
+
+sim.delete_sms_message m1
 sim.close
 
 ```
