@@ -1,7 +1,9 @@
 class SimCard
   class Phonebook
-    attr_reader :min_index, :max_index, :entries
+    attr_reader :min_index, :max_index
     
+    # Representation of SIM card's phonebook. when using real SIM, you should get an instance of Phonebook by calling Sim.phonebook
+    # * at_interface - subclass of AtInterface
     def initialize at_interface
       @at_interface = at_interface
       @entries = nil
@@ -10,6 +12,9 @@ class SimCard
       load_basic_info
     end
     
+    # return array of phonebook Entries
+    # first time called the method loads the data from SIM card, which may take some time.
+    # on later calls of this method the data is not loaded from SIM but provided from cache.
     def all_entries
       return @entries if @entries
       
@@ -27,6 +32,10 @@ class SimCard
       return @entries
     end
     
+    # simple search by phone numbers designed to deal both with national and international numbers in the phoneboook.
+    # * phone_number - phone number to search for
+    # * tail_length - number of last N digits to use in search. Default is 8, i.e., only last 8 digits of the phone number are enough to provide a matching entry.
+    # returns: the first phonebook Entry which matches conditions, or nil if no entry is found
     def fuzzy_search_by_number phone_number, tail_length = 8
 
       query_phone_number = phone_number[(-1 * tail_length)..-1]
