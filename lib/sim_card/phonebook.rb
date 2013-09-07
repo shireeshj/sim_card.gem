@@ -19,7 +19,9 @@ class SimCard
         next if raw.include?("ERROR") # blank entry
         
         _, phone_number, _, name, _ = raw.split("\"")
-        @entries << PhonebookEntry.new(index, phone_number, name)
+        if phone_number && phone_number != '' && name && name != ''
+          @entries << PhonebookEntry.new(index, phone_number, name)
+        end
       end
       
       return @entries
