@@ -25,6 +25,19 @@ class SimCard
       return @entries
     end
     
+    def fuzzy_search_by_number phone_number, tail_length = 8
+
+      query_phone_number = phone_number[(-1 * tail_length)..-1]
+      all_entries.each do |entry|
+        entry_phone_number = entry.phone_number[(-1 * tail_length)..-1]
+        if query_phone_number == entry_phone_number
+          return entry
+        end
+      end
+      
+      return nil
+    end
+    
     private
     
     def switch_to_sim_phonebook
