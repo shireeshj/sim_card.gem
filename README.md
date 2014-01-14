@@ -17,7 +17,7 @@ The first pieces of code are based on following sample: http://www.dzone.com/sni
 
 ### 0.0.2
 
-* Can only list and delete arrived SMS messages, which is helpful enough when you need [redirect SMS messages](https://gist.github.com/petervojtek/6297229).
+* Can only list and delete arrived SMS messages, which is helpful enough when you need [forward SMS messages](https://github.com/petervojtek/diy/wiki/SMS-Forwarding-with-Raspberry-Pi).
 
 ## Hardware
 
